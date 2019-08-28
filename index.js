@@ -16,7 +16,8 @@ if (process.argv[2] != undefined) {
     replacementColor = process.argv[2];
 }
 
-console.log(`Background color will be replaced with: ${replacementColor}`);
+console.log(`Background color will be replaced with: ${replacementColor.toString()}`);
+
 
 //Get files
 fs.readdir(directoryPath, function (err, files) {
@@ -24,8 +25,13 @@ fs.readdir(directoryPath, function (err, files) {
     if (err) {
         return console.log('Unable to scan directory: ' + err);
     }
+    //Remove output
+    if (fs.existsSync('output.txt')) {
+        //file exists
+        fs.unlinkSync('output.txt')
+      }
+    
     //Listing files
-    //files.map(file)
     files.forEach(function (file) {
         if (getExtension(file) == '.svg') {
             // Convert each file
@@ -39,8 +45,7 @@ function convertToPng(file) {
     fs.readFile(`${directoryPath}/${file}`, function (err, data) {
         if (err) throw err;
         let svgString;
-        svgString = data.toString().replaceAll('HEXCOD', replacementColor);
-
+        svgString = data.toString().replaceAll('HEXCOD', replacementColor.toString());
         svg2img(svgString, { 'width': 66, 'height': 66 }, function (error, buffer) {
             //Output the file
             fs.writeFileSync(`${outputPath}/${file.removeExtension()}.png`, buffer);
